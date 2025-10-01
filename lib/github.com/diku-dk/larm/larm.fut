@@ -14,6 +14,9 @@ type duration = f32
 -- | Frequency in kHz.
 type kHz = f32
 
+-- | Frequency in Hz.
+type Hz = f32
+
 local
 def arange (start: f32) (stop: f32) (step: f32) : []f32 =
   let n = f32.max 0 (f32.floor ((stop - start) / step))
@@ -86,37 +89,37 @@ def tone (f: time -> amplitude) : sound =
 -- | Various primitive waveforms. Note that these are not of type `sound`@term,
 -- but straight up functions from time to amplitude.
 module waveforms = {
-  def sine (frequency: kHz) (t: time) : amplitude =
+  def sine (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2 * f32.pi
     in f32.sin phase
 
-  def triangle (frequency: kHz) (t: time) : amplitude =
+  def triangle (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2.0 * f32.pi
     let p = phase / (2.0 * f32.pi)
     in 2.0 * f32.abs (2.0 * (p - f32.floor (p + 0.5))) - 1.0
 
-  def square (frequency: kHz) (t: time) : amplitude =
+  def square (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2.0 * f32.pi
     in f32.sgn (f32.sin phase)
 
-  def sawtooth (frequency: kHz) (t: time) : amplitude =
+  def sawtooth (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2.0 * f32.pi
     let p = phase / (2.0 * f32.pi)
     in 2 * (p - f32.floor (p + 0.5))
 
-  def smoothtooth (frequency: kHz) (t: time) : amplitude =
+  def smoothtooth (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2 * f32.pi
     let t' = t + f32.sin phase / (frequency * 2 * f32.pi)
     let newPhase = t' * frequency * 2 * f32.pi
     in f32.sin newPhase
 
-  def better_smoothtooth (frequency: kHz) (t: time) : amplitude =
+  def better_smoothtooth (frequency: Hz) (t: time) : amplitude =
     let phase = t * frequency * 2 * f32.pi
     let t' = t + f32.sin phase / (frequency * 2 * f32.pi) * 2
     let newPhase = t' * frequency * 2 * f32.pi
     in f32.sin newPhase
 
-  def continuous_noise (frequency: kHz) (t: time) : amplitude =
+  def continuous_noise (frequency: Hz) (t: time) : amplitude =
     let t' = t + smoothtooth t frequency
     let newPhase = t' * frequency * 2 * f32.pi
     in f32.sin newPhase
@@ -184,7 +187,7 @@ module effects = {
   -- | Make a sound whose amplitude is the derivative of an underlying sound.
   -- This usually sounds horrible.
   def diff (s: sound) : sound =
-    s with gen = jvp s.gen 1
+    s with gen = \t -> jvp s.gen t 1
 }
 
 -- | Various instruments.
