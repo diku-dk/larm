@@ -75,7 +75,7 @@ def delay (d: duration) (s: sound) : sound =
   , overlap = s.overlap
   }
 
--- | Scale the volumne of a sound.
+-- | Scale the volume of a sound.
 def scale (x: f32) (s: sound) : sound =
   { gen = \t -> x * s.gen t
   , dur = s.dur
