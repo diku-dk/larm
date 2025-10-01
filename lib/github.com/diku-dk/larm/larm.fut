@@ -60,7 +60,7 @@ def to (a: sound) (b: sound) : sound =
           then a.gen t
           else 0
         let b' =
-          if (t - a.dur) < b.dur + b.overlap
+          if t > a.dur && (t - a.dur) < b.dur + b.overlap
           then b.gen (t - a.dur)
           else 0
         in a' + b'
