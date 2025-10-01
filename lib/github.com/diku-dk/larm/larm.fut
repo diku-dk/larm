@@ -14,6 +14,11 @@ type duration = f32
 -- | Frequency in kHz.
 type kHz = f32
 
+local
+def arange (start: f32) (stop: f32) (step: f32) : []f32 =
+  let n = f32.max 0 (f32.floor ((stop - start) / step))
+  in tabulate (i64.f32 n) (\i -> start + f32.i64 i * step)
+
 -- | Representation of a sound with associated duration information.
 --
 -- The `gen` field is a function from time to amplitude, i.e., the function that
@@ -162,6 +167,24 @@ def softclip (s: time -> amplitude) (t: time) : amplitude =
 module effects = {
   def harmonic (sound: (time -> amplitude)) (t: time) : amplitude =
     sound t + 0.3 * sound (2 * t) + 0.1 * sound (3 * t)
+
+  -- | Make the sample at a given time the average of the samples in a *(-r,r)*
+  -- span around that time, itself sampled at the given rate. Note that this is
+  -- a fairly expensive effect.
+  def avg (r: f32) (rate: kHz) (s: sound) : sound =
+    { gen =
+        \t ->
+          let pts = arange (t - r) (t + r) (r * 2 / rate)
+          in f32.sum (map s.gen pts)
+             / f32.i64 (length pts)
+    , dur = s.dur + r
+    , overlap = s.overlap
+    }
+
+  -- | Make a sound whose amplitude is the derivative of an underlying sound.
+  -- This usually sounds horrible.
+  def diff (s: sound) : sound =
+    s with gen = jvp s.gen 1
 }
 
 -- | Various instruments.
@@ -304,11 +327,6 @@ module progressions = {
        `to` multi (midi.C 3)
        `to` multi (midi.B 2)
 }
-
-local
-def arange (start: f32) (stop: f32) (step: f32) : []f32 =
-  let n = f32.max 0 (f32.floor ((stop - start) / step))
-  in tabulate (i64.f32 n) (\i -> start + f32.i64 i * step)
 
 -- | Sample a sound in a given range and with a given sampling frequency. 44100
 -- is a good frequency to use.
