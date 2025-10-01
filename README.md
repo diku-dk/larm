@@ -28,7 +28,7 @@ def sample_music start end =
 
 ```
 > :audio sample_music 0 15;
-codec: mp4
+codec: mp3
 ```
 
-![](README-img/1d24d81098fda23d4fdee88d8c23c081-output.mp4)
+![](README-img/1081966764298477b622ad879d6be9e5-output.mp3)

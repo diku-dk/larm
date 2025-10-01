@@ -25,4 +25,7 @@ def sample_music start end =
   sample start end 44100 music
 
 -- > :audio sample_music 0 15;
--- codec: mp4
+-- codec: mp3
+
+-- I do not know how to embed this in a GitHub README, but it sounds a bit like
+-- [this](https://raw.githubusercontent.com/diku-dk/larm/refs/heads/main/README-img/1081966764298477b622ad879d6be9e5-output.mp3).
